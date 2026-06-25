@@ -1,0 +1,50 @@
+# CLAUDE.md
+
+<PROJECT_NAME> 專案的協作工作流軟規範（由 **specflow** 插件驅動）。
+團隊各自用 Claude Code agent 開發同一專案：
+**`specs/`** = 專案記憶（系統做什麼），**GitHub Issues** = 輕量 TODO（這次要做什麼），**branch/PR/CI** = 程式碼與守門。
+
+> 流程的可執行部分（指令 / 自然語言觸發 / 開工簡報 / issue 模板）由 specflow 插件提供，本檔只記專案**軟規範**與**專案專屬設定**。
+
+## 協作工作流（務必遵守）
+
+- 新需求用 `new-feature` 開**輕量 issue**（目標 / 要做什麼 / 驗收條件）；明確小功能預設 `ready`，需討論或跨端的開 `needs-design`。
+- 開工前用 `today` 看可認領的卡；只接 `ready` 且未指派的 issue。`needs-design` 先在 issue 討論，議定後 `ready` 開放認領。
+- 認領用 `claim`（開 `feat/<n>-<slug>` branch，並把相關 `specs/` 載入 context）。
+- 進度用 `report`（commit + push + 在 issue 留言；交接時移除 assignee）。
+- **完工前必須整理 `specs/`**：把這次的行為變更整理回對應主題的 `specs/<主題>.md`（新增功能就新增一個檔）。用 `finish` 開 PR。
+- `finish`：對有改動的子專案跑 typecheck/build → 開 PR（內文必含 `Closes #<n>`）。
+
+> **觸發方式（給 agent）**：上面動作（new-feature / ready / today / claim / report / finish）同時是 **slash command**（`/specflow:<name>`）與 **skill**（講白話自動觸發，如「叫後端補接口」→ new-feature、「我來接 #5」→ claim）。Agent 收到對應語意的需求時**主動走對應流程**，不要繞過流程直接動手；語意模糊或牽涉開卡 / 認領 / 交接時，先跟使用者確認再執行。狀態流轉一律經這些動作，別手動改 label / assignee。
+
+## 三層職責（零重疊）
+
+| 關注點 | 唯一權威來源 |
+|---|---|
+| 系統「做什麼」（現行真實行為） | `specs/<主題>.md` |
+| 這次要做什麼（需求 / 目標 / 驗收） | GitHub issue 內文 |
+| 誰認領、現在什麼狀態 | GitHub issue（assignee + label） |
+| 程式碼 / 驗證 / 部署 | branch / PR / CI / main |
+
+## specs/ 是專案記憶（強制維護）
+
+- `specs/<主題>.md` 用**純 markdown** 記錄系統**現在實際會做什麼**。開工時讀它，比重掃 codebase 省 context。
+- 格式與約定見 `specs/README.md`。
+- **記憶會腐壞 → 用 CI 強制**：每個 PR 的 CI `specs` job 會擋下「沒更新 `specs/`」的變更。純重構 / 修字 / 純文件等無行為變更者，掛 `no-spec` label 豁免。
+- 設計草稿 / 未落地的提案放 `docs/design/`，別塞進 `specs/`（specs 只放 as-built）。
+
+## 狀態機
+
+```
+needs-design ──(ready)──▶ ready ──(claim)──▶ in-progress ──(finish 開 PR)──▶ in-review ──(merge)──▶ closed
+交接：in-progress 時 report 移除 assignee（保留 in-progress）→「in-progress + 無 assignee = 待接手」
+```
+
+## 專案專屬設定（請填）
+
+- **領域分工 label**：<例：frontend / backend；無分工則刪掉此項，並在開 issue 時不加領域 label>
+- **本機自我檢查指令**（`finish` 用）：
+  - <領域 A>：`npm --prefix <dir-a> run typecheck && npm --prefix <dir-a> run build`
+  - <領域 B>：`npm --prefix <dir-b> run typecheck && npm --prefix <dir-b> run build`
+- **`DEV_DOMAIN`**：每台機器本機設定領域（**不要 commit**）。specflow 的 SessionStart hook 讀它，開工時只顯示你領域的卡。
+  設定方式：寫進 shell profile（`export DEV_DOMAIN=<領域>`），或 `.claude/settings.local.json` 的 `env`。未設定則顯示全部領域。

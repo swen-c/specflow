@@ -1,0 +1,11 @@
+{
+  "name": "specflow",
+  "owner": { "name": "SwenC" },
+  "plugins": [
+    {
+      "name": "specflow",
+      "source": "./plugins/specflow",
+      "description": "Spec-driven issue → PR collaboration workflow as slash commands + skills + a SessionStart briefing + a specs CI gate."
+    }
+  ]
+}

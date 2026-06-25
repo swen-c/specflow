@@ -1,0 +1,36 @@
+# specflow 的 specs 守門 job —— 把這個 job 併進你專案的 .github/workflows/ci.yml
+# （或整檔放成獨立 workflow）。它強制「開發完整理 specs/」：
+#   PR 必須有動到 specs/，否則擋下；純重構/修字等無行為變更掛 no-spec label 豁免。
+# 純 git diff 檢查，不呼叫任何 AI 模型、不耗 token。
+# 記得到 GitHub repo 設定把 job 名稱 `specs` 設為 required status check。
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  specs:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require specs update (unless no-spec label)
+        env:
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if printf ',%s,' "$LABELS" | grep -q ',no-spec,'; then
+            echo "✓ 掛了 no-spec label，豁免 specs 更新關卡。"
+            exit 0
+          fi
+          if git diff --name-only "$BASE_SHA...$HEAD_SHA" | grep -q '^specs/'; then
+            echo "✓ 偵測到 specs/ 變更。"
+            exit 0
+          fi
+          echo "::error::此 PR 未更新 specs/。開發完請把行為變更整理回 specs/；若確實無行為變更，請為 PR 掛上 no-spec label。"
+          exit 1
