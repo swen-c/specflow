@@ -13,19 +13,7 @@
 
 ## 流程一覽（狀態機）
 
-```
-       new-feature                 ready               claim
-需求 ─────────────▶ needs-design ─────────▶ ready ───────────▶ in-progress ──┐
-  └─ 明確小功能可直接開 ready ───────────────────────┘   (指派@me / 開 branch / 載入 specs)│
-                                                                                  ▼
-                                                     開發 ◀── 讀相關 specs/ ──────┘
-                                                       │
-                  report（交接）│ report（純回報）       │ finish
-   in-progress + 無 assignee ◀──┴─ commit+push+留言 ──▶ 整理 specs → typecheck/build → 開 PR(Closes #n)
-   =「待接手」                                                          │
-        ▲                                                              ▼
-        └─ 另一 agent today 看到 → claim 接手 ◀── in-review ──merge──▶ closed
-```
+![specflow 協作流程狀態機：需求 → needs-design → ready → in-progress → in-review → closed，以及 in-progress 移除 assignee 後成為「待接手」、他人 today 看到並 claim 接手的迴圈](assets/flow.png)
 
 **「接任務」的兩個入口**（都走 `today` → `claim`）：
 
