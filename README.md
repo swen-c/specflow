@@ -56,43 +56,97 @@
 | `report` | 回報進度（commit/push/留言）；帶交接語意則移除 assignee | `/specflow:report <n>` |
 | `finish` | 整理 specs → typecheck/build → 開 PR（`Closes #<n>`）→ 轉 `in-review` | `/specflow:finish <n>` |
 | `init` | **一次性**把新專案接上：建 labels、scaffold `specs/` / `CLAUDE.md` / CI 守門 | `/specflow:init` |
+| `doctor` | 健檢專案有沒有接好（labels / CLAUDE.md 佔位 / specs / CI / gh 登入），列出待補項 | `/specflow:doctor` |
 
-## 安裝
+## 安裝與使用（一般使用者）
 
-### 給團隊一起用（建議：透過 marketplace）
+不用 clone 這個 repo、不用碰任何路徑。整個過程就是「在 Claude Code 裡打幾行字」。
 
-成員在自己的 Claude Code 執行（一次 add，之後 install）：
+### 前置：先裝 GitHub CLI 並登入（每台電腦做一次）
+
+specflow 靠 GitHub CLI（`gh`）幫你開卡 / 認領 / 開 PR，所以先把它準備好。**依你的系統挑一段裝**：
+
+**macOS**
+```bash
+brew install gh                       # 用 Homebrew
+# 沒有 Homebrew？到 https://cli.github.com 下載 .pkg 安裝
+```
+
+**Windows**（PowerShell）
+```powershell
+winget install --id GitHub.cli        # 內建 winget，最簡單
+# 或：scoop install gh / choco install gh
+# 都沒有？到 https://cli.github.com 下載 .msi 安裝
+```
+
+**Linux**
+```bash
+sudo apt install gh                   # Debian / Ubuntu
+sudo dnf install gh                   # Fedora / RHEL / CentOS
+sudo pacman -S github-cli             # Arch
+# 其他發行版或要最新版：見 https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+```
+
+裝好後，**三個系統都一樣**，登入並確認：
+```bash
+gh auth login        # 照提示選 GitHub.com，用瀏覽器登入
+gh auth status       # 看到綠勾就代表登入成功
+```
+
+### 第 1 步：安裝 specflow（在 Claude Code 裡打這兩行）
 
 ```
 /plugin marketplace add swen-c/specflow
 /plugin install specflow@specflow
 ```
 
-往後流程有更新，成員用 `/plugin marketplace update specflow` 拉新版即可。
+裝這一次就好，之後每個專案、每次開 Claude Code 都會自動帶著。
+（日後流程有更新，再打一次 `/plugin marketplace update specflow` 就能拉到新版。）
 
-### 本機開發 / 試用（免安裝）
+### 第 2 步：在你的專案啟用（每個專案做一次）
+
+1. 用 Claude Code 打開你要管理的專案（要是一個已經連到 GitHub 的 git 專案）。
+2. 直接跟它說「**幫我初始化 specflow**」（或打 `/specflow:init`）。它會自動建好 GitHub labels、`specs/` 記憶夾、`CLAUDE.md` 規範、CI 守門。
+3. 過程中它會請你補兩件專案專屬的小事：**領域 label**（如 frontend / backend，沒有可略過）和 **typecheck / build 指令**；照著填即可。
+
+### 第 3 步：開始用 —— 直接講白話就好
+
+不用記任何指令，像平常聊天一樣跟 Claude 說：
+
+- 「開一張卡：登入頁要加記住我」 → 自動幫你開 issue
+- 「現在有什麼可以接？」 → 列出可接的卡
+- 「我來接 #12」 → 自動認領、開 branch、載入相關記憶
+- 「收尾開 PR」 → 自動整理 specs、跑檢查、開 PR
+
+> 想精確控制時，也可以直接打 `/specflow:<動作>`（例 `/specflow:claim 12`）—— 但這只是備援，平常講白話就夠了。
+
+### 選配：只看自己領域的卡
+
+團隊有前後端分工時，每人每台電腦設一個環境變數（**不要 commit**），開工簡報與「現在有什麼可以接」就只會顯示你領域的卡：
 
 ```bash
-claude --plugin-dir /path/to/specflow/plugins/specflow
+export DEV_DOMAIN=frontend   # 或 backend
 ```
 
-> 插件指令一律命名空間化為 `/specflow:<name>`（例 `/specflow:next`、`/specflow:claim 12`）。
-> 白話也能觸發：「我來接 #5」→ claim、「叫後端補接口」→ new-feature、「收尾開 PR」→ finish。
+## 想改 specflow 本身？（開發者，需要 clone）
 
-## 新專案 30 秒接上
+一般使用者用不到這段 —— 只有你要**修改 specflow 插件內容**（改流程、改文案、加動作）時才需要。
+這時不經 marketplace，而是把 repo 抓到本機、直接從資料夾載入，改完即時生效：
 
-1. 安裝插件（見上）。
-2. 在專案根目錄執行 `/specflow:init`，它會：
-   - 建立 GitHub labels（`needs-design` / `ready` / `in-progress` / `in-review` / `no-spec`）。
-   - 若無 `specs/` → scaffold `specs/README.md`。
-   - 若無 `CLAUDE.md` → 從樣板複製，**請填好專案專屬處**（領域 label、各領域的 typecheck/build 指令）。
-   - 提示把 `templates/ci-specs-gate.yml` 的 `specs` job 併入 CI，並在 repo 設為 required status check。
-3. （選填）每人每台機器 `export DEV_DOMAIN=<領域>`（不要 commit），開工簡報與 `next` 會只顯示你領域的卡。
-4. 之後就**用白話跟 Agent 說話**即可（見上方「怎麼用」）—— `init` 放進專案的 `CLAUDE.md` 會讓 Agent 自動走流程，不需要每次打指令。
+```bash
+# 1. 把這個 repo 抓到本機
+git clone https://github.com/swen-c/specflow.git
 
-## 客製
+# 2. 切到你的測試專案，用本機這份插件啟動 claude（路徑指到含 .claude-plugin 的那層）
+cd /你的/測試專案
+claude --plugin-dir /剛剛clone的位置/specflow/plugins/specflow
+```
 
-- **改命令前綴**：把 `plugins/specflow/.claude-plugin/plugin.json` 與 `.claude-plugin/marketplace.json` 的 `name` 改成你要的（指令會跟著變成 `/<新名>:claim`）。
+- 改了 `plugins/specflow/` 裡的檔案後，在 claude 裡打 `/reload-plugins` 即生效，不用重開。
+- 這種掛載只在當次 session 有效；要常用 / 給別人用還是回到上面的 marketplace 安裝。
+
+常見客製：
+- **改命令前綴**：把 `plugins/specflow/.claude-plugin/plugin.json` 與 `.claude-plugin/marketplace.json` 的 `name` 改掉（指令會變成 `/<新名>:claim`）。
 - **加領域分工**：在各專案的 `CLAUDE.md` 與 labels 自行定義（如 frontend/backend）；插件本身不綁死領域。
 - **調 specs 格式 / CI**：改 `templates/specs-README.md`、`templates/ci-specs-gate.yml`。
 
@@ -107,8 +161,9 @@ specflow/                                   ← 此 repo（同時是 marketplace
 ├── .claude-plugin/marketplace.json
 ├── plugins/specflow/                       ← 插件本體
 │   ├── .claude-plugin/plugin.json
-│   ├── skills/{new-feature,ready,next,claim,report,finish,init}/SKILL.md
+│   ├── skills/{new-feature,ready,next,claim,report,finish,init,doctor}/SKILL.md
 │   ├── hooks/{hooks.json,session-start.sh}
+│   ├── scripts/doctor.sh
 │   ├── rules/issue-template.md
 │   └── templates/{CLAUDE.md.template,specs-README.md,ci-specs-gate.yml,setup-labels.sh}
 └── README.md
