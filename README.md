@@ -5,7 +5,7 @@
 > **`specs/`** = 專案記憶（系統做什麼）· **GitHub Issue** = 輕量 TODO（這次做什麼）· **branch / PR / CI** = 程式碼與守門。
 > 三層零重疊，狀態流轉一律經固定動作 —— 讓多人 / 多個 AI agent 能無痛接力同一專案。
 
-![specflow 協作流程狀態機：需求 → needs-design → ready → in-progress → in-review → closed，以及 in-progress 移除 assignee 後成為「待接手」、他人 today 看到並 claim 接手的迴圈](assets/flow.png)
+![specflow 協作流程狀態機：需求 → needs-design → ready → in-progress → in-review → closed，以及 in-progress 移除 assignee 後成為「待接手」、他人 next 看到並 claim 接手的迴圈](assets/flow.png)
 
 ## 為什麼用它
 
@@ -15,12 +15,12 @@
 
 ## 接任務的兩個入口
 
-對照最上方流程圖，「接任務」都走 `today` → `claim`：
+對照最上方流程圖，「接任務」都走 `next` → `claim`：
 
 | 場景 | 怎麼接 |
 |---|---|
-| 接全新的卡 | `today` 列 `ready + 未指派` → `claim <n>` |
-| 接別人交接的卡 | `today` 列 `in-progress + 無 assignee`（待接手）→ `claim <n>` |
+| 接全新的卡 | `next` 列 `ready + 未指派` → `claim <n>` |
+| 接別人交接的卡 | `next` 列 `in-progress + 無 assignee`（待接手）→ `claim <n>` |
 
 ## 動作（skill / 指令）
 
@@ -30,7 +30,7 @@
 |---|---|
 | `new-feature` | 開一張輕量 issue（目標 / 要做什麼 / 驗收條件） |
 | `ready` | 議定後把 `needs-design` 開放認領（→ `ready`） |
-| `today` | 列今天可接的卡（全新可認領 + 待接手），依 `DEV_DOMAIN` 過濾 |
+| `next` | 列現在可接的卡（全新可認領 + 待接手），依 `DEV_DOMAIN` 過濾 |
 | `claim` | 認領：指派 + 轉 `in-progress` + 開 `feat/<n>-<slug>` + 載入 specs |
 | `report` | 回報進度（commit/push/留言）；帶交接語意則移除 assignee |
 | `finish` | 整理 specs → typecheck/build → 開 PR（`Closes #<n>`）→ 轉 `in-review` |
@@ -57,7 +57,7 @@
 claude --plugin-dir /path/to/specflow/plugins/specflow
 ```
 
-> 插件指令一律命名空間化為 `/specflow:<name>`（例 `/specflow:today`、`/specflow:claim 12`）。
+> 插件指令一律命名空間化為 `/specflow:<name>`（例 `/specflow:next`、`/specflow:claim 12`）。
 > 白話也能觸發：「我來接 #5」→ claim、「叫後端補接口」→ new-feature、「收尾開 PR」→ finish。
 
 ## 新專案 30 秒接上
@@ -68,7 +68,7 @@ claude --plugin-dir /path/to/specflow/plugins/specflow
    - 若無 `specs/` → scaffold `specs/README.md`。
    - 若無 `CLAUDE.md` → 從樣板複製，**請填好專案專屬處**（領域 label、各領域的 typecheck/build 指令）。
    - 提示把 `templates/ci-specs-gate.yml` 的 `specs` job 併入 CI，並在 repo 設為 required status check。
-3. （選填）每人每台機器 `export DEV_DOMAIN=<領域>`（不要 commit），開工簡報與 `today` 會只顯示你領域的卡。
+3. （選填）每人每台機器 `export DEV_DOMAIN=<領域>`（不要 commit），開工簡報與 `next` 會只顯示你領域的卡。
 
 ## 客製
 
@@ -87,7 +87,7 @@ specflow/                                   ← 此 repo（同時是 marketplace
 ├── .claude-plugin/marketplace.json
 ├── plugins/specflow/                       ← 插件本體
 │   ├── .claude-plugin/plugin.json
-│   ├── skills/{new-feature,ready,today,claim,report,finish,init}/SKILL.md
+│   ├── skills/{new-feature,ready,next,claim,report,finish,init}/SKILL.md
 │   ├── hooks/{hooks.json,session-start.sh}
 │   ├── rules/issue-template.md
 │   └── templates/{CLAUDE.md.template,specs-README.md,ci-specs-gate.yml,setup-labels.sh}

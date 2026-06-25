@@ -55,7 +55,7 @@
   <text x="580" y="216" font-size="12" fill="#5F5E5A" text-anchor="start">移除 assignee</text>
 
   <line x1="498" y1="244" x2="498" y2="172" stroke="#73726C" stroke-width="1.6" marker-end="url(#ah)"/>
-  <text x="484" y="200" font-size="12" fill="#5F5E5A" text-anchor="end">today 看到</text>
+  <text x="484" y="200" font-size="12" fill="#5F5E5A" text-anchor="end">next 看到</text>
   <text x="484" y="216" font-size="12" fill="#5F5E5A" text-anchor="end">→ claim 接手</text>
 
   <rect x="460" y="246" width="144" height="58" rx="11" fill="#E6F1FB" stroke="#85B7EB" stroke-width="1"/>

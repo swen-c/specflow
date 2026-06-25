@@ -2,7 +2,7 @@
   "name": "specflow",
   "displayName": "Spec-Driven Issue Flow",
   "version": "1.0.0",
-  "description": "Multi-agent / multi-dev collaboration workflow: lightweight GitHub issue → claim → develop → update specs → PR, gated by CI. Ships the flow as skills (also invokable as /specflow:today, /specflow:claim …), a SessionStart briefing, an issue template, a specs CI gate, and project bootstrap templates.",
+  "description": "Multi-agent / multi-dev collaboration workflow: lightweight GitHub issue → claim → develop → update specs → PR, gated by CI. Ships the flow as skills (also invokable as /specflow:next, /specflow:claim …), a SessionStart briefing, an issue template, a specs CI gate, and project bootstrap templates.",
   "author": { "name": "SwenC" },
   "homepage": "https://github.com/swen-c/specflow",
   "repository": "https://github.com/swen-c/specflow",

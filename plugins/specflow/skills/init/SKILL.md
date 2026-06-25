@@ -19,5 +19,5 @@ description: Use to bootstrap THIS project onto the specflow workflow — 初始
    cp "${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.md.template" CLAUDE.md
    ```
 4. **specs CI 守門**：把 `${CLAUDE_PLUGIN_ROOT}/templates/ci-specs-gate.yml` 的 `specs` job 併入專案 `.github/workflows/`（既有 CI 就把該 job 加進去；沒有就把整檔放成新 workflow）。提醒使用者到 GitHub repo 設定把 `specs` 設為 **required status check**。
-5. **（選填）本機領域過濾**：提示每位成員每台機器設 `export DEV_DOMAIN=<領域>`（**不要 commit**），SessionStart 與 `today` 會只顯示該領域的卡。
+5. **（選填）本機領域過濾**：提示每位成員每台機器設 `export DEV_DOMAIN=<領域>`（**不要 commit**），SessionStart 與 `next` 會只顯示該領域的卡。
 6. 回報已完成哪幾項、哪些需使用者手動處理（如 required status checks 只能在 GitHub repo 設定頁開）。
