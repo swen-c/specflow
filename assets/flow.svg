@@ -50,6 +50,9 @@
   <path d="M500,112 C 500,84 564,84 564,112" fill="none" stroke="#73726C" stroke-width="1.5" marker-end="url(#ah)"/>
   <text x="532" y="78" font-size="12" fill="#5F5E5A" text-anchor="middle">report 回報進度（仍 in-progress）</text>
 
+  <path d="M690,112 C 690,84 750,84 750,112" fill="none" stroke="#73726C" stroke-width="1.5" marker-end="url(#ah)"/>
+  <text x="720" y="78" font-size="12" fill="#5F5E5A" text-anchor="middle">review 審查 PR</text>
+
   <line x1="566" y1="172" x2="566" y2="244" stroke="#73726C" stroke-width="1.6" marker-end="url(#ah)"/>
   <text x="580" y="200" font-size="12" fill="#5F5E5A" text-anchor="start">report --handoff</text>
   <text x="580" y="216" font-size="12" fill="#5F5E5A" text-anchor="start">移除 assignee</text>
@@ -64,5 +67,5 @@
 
   <text x="214" y="300" font-size="12" fill="#5F5E5A" text-anchor="middle">claim：指派 @me · 開 feat branch · 載入 specs</text>
   <text x="214" y="320" font-size="12" fill="#5F5E5A" text-anchor="middle">finish：整理 specs · typecheck/build · 開 PR（Closes #n）</text>
-  <text x="214" y="340" font-size="12" fill="#888780" text-anchor="middle">specs/ = 系統現在做什麼的記憶 · label+assignee = 誰在做/什麼狀態</text>
+  <text x="470" y="340" font-size="12" fill="#888780" text-anchor="middle">記憶三分工：issue = 這次做什麼 · specs/ = 系統現在怎樣 · docs/adr = 為什麼這樣設計　（label+assignee = 誰在做 / 什麼狀態）</text>
 </svg>

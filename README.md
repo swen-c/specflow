@@ -2,8 +2,8 @@
 
 一套**可跨專案引用**的協作流程，包成 Claude Code 插件。核心理念：
 
-> **`specs/`** = 專案記憶（系統做什麼）· **GitHub Issue** = 輕量 TODO（這次做什麼）· **branch / PR / CI** = 程式碼與守門。
-> 三層零重疊，狀態流轉一律經固定動作 —— 讓多人 / 多個 AI agent 能無痛接力同一專案。
+> **三種記憶各司其職**：`GitHub Issue` = 這次做什麼 · `specs/` = 系統現在怎樣 · `docs/adr/` = 為什麼這樣設計；程式碼 / 驗證交給 `branch / PR / CI`。
+> 零重疊，狀態流轉一律經固定動作 —— 讓多人 / 多個 AI agent 無痛接力同一專案。
 
 ![specflow 協作流程狀態機：需求 → needs-design → ready → in-progress → in-review → closed，以及 in-progress 移除 assignee 後成為「待接手」、他人 next 看到並 claim 接手的迴圈](assets/flow.png)
 
@@ -25,6 +25,8 @@
 | 「我來接 #12」/「開工」 | `claim` 認領 + 開 branch + 載入 specs |
 | 「同步一下進度」/「我先做到這，交接出去」 | `report`（含交接） |
 | 「收尾開 PR」/「完工了」 | `finish` 整理 specs + 開 PR |
+| 「幫我看這個 PR」/「這張可以合併嗎？」 | `review` 審查 + 給 approve / 要修改 |
+| 「記一下為什麼選這個架構」 | `adr` 寫一筆架構決策 |
 
 **為什麼 Agent 會自己跑**（三個機制疊加，裝好就生效）：
 
@@ -110,6 +112,7 @@ gh auth status       # 看到綠勾就代表登入成功
 1. 用 Claude Code 打開你要管理的專案（要是一個已經連到 GitHub 的 git 專案）。
 2. 直接跟它說「**幫我初始化 specflow**」（或打 `/specflow:init`）。它會自動建好 GitHub labels、`specs/` 記憶夾、`CLAUDE.md` 規範、CI 守門。
 3. 過程中它會請你補兩件專案專屬的小事：**領域 label**（如 frontend / backend，沒有可略過）和 **typecheck / build 指令**；照著填即可。
+4. 完成後跟它說「**健檢一下**」（或 `/specflow:doctor`），確認 labels / `CLAUDE.md` / `specs/` / CI 都接好了。
 
 ### 第 3 步：開始用 —— 直接講白話就好
 
