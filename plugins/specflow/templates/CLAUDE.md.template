@@ -33,6 +33,7 @@
 - 格式與約定見 `specs/README.md`。
 - **記憶會腐壞 → 用 CI 強制**：每個 PR 的 CI `specs` job 會擋下「沒更新 `specs/`」的變更。純重構 / 修字 / 純文件等無行為變更者，掛 `no-spec` label 豁免。
 - 設計草稿 / 未落地的提案放 `docs/design/`，別塞進 `specs/`（specs 只放 as-built）。
+- **架構決策的「為什麼」記在 `docs/adr/`**（用 `adr` 動作）：specs 是 as-built 的「做什麼」快照、會被改寫；ADR 是 append-only 的決策歷史、不改舊檔（被取代就開新號）。兩者分工，別混。
 
 ## 狀態機
 
@@ -40,6 +41,16 @@
 needs-design ──(ready)──▶ ready ──(claim)──▶ in-progress ──(finish 開 PR)──▶ in-review ──(merge)──▶ closed
 交接：in-progress 時 report 移除 assignee（保留 in-progress）→「in-progress + 無 assignee = 待接手」
 ```
+
+## AI Agent 權限（人機分工）
+
+| 類別 | 動作 |
+|---|---|
+| ✅ 可自動執行 | 開 / 切 `feat/*` branch、編輯 `specs/` 與 `docs/`、草擬 issue / PR / ADR 內文、跑 typecheck / build、唯讀查詢（`next` / `doctor` / issue 清單 / PR diff） |
+| ⚠️ 先跟人確認再做 | 送出開卡（`new-feature`）、認領（`claim`）、交接（`report --handoff`）、開 PR（`finish`）、送出審查結論（`review` 的 approve / request-changes） |
+| ⛔ 禁止 | 直接 merge PR、push 到 `main`、改本檔流程規範 / 公版規則、動別人正在做的卡 |
+
+> 原則：**動到 GitHub 狀態或對外送出**的動作要人點頭；**本地、可逆、唯讀**的動作可自動做。
 
 ## 專案專屬設定（請填）
 
