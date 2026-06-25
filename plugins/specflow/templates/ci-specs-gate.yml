@@ -1,7 +1,8 @@
 # specflow 的 specs 守門 job —— 把這個 job 併進你專案的 .github/workflows/ci.yml
-# （或整檔放成獨立 workflow）。它強制「開發完整理 specs/」：
-#   PR 必須有動到 specs/，否則擋下；純重構/修字等無行為變更掛 no-spec label 豁免。
-# 純 git diff 檢查，不呼叫任何 AI 模型、不耗 token。
+# （或整檔放成獨立 workflow）。它強制「開發完整理 specs/」並檢查格式：
+#   1) PR 必須有動到 specs/，否則擋下；純重構/修字等無行為變更掛 no-spec label 豁免。
+#   2) 新增/修改的 specs/<主題>.md 必須符合四段格式（# 標題 / > 一句話 / ## 行為）。
+# 純 git diff + grep 檢查，不呼叫任何 AI 模型、不耗 token。
 # 記得到 GitHub repo 設定把 job 名稱 `specs` 設為 required status check。
 
 name: CI
@@ -18,19 +19,37 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Require specs update (unless no-spec label)
+      - name: Require + lint specs update (unless no-spec label)
         env:
           LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           if printf ',%s,' "$LABELS" | grep -q ',no-spec,'; then
-            echo "✓ 掛了 no-spec label，豁免 specs 更新關卡。"
+            echo "✓ 掛了 no-spec label，豁免 specs 守門。"
             exit 0
           fi
-          if git diff --name-only "$BASE_SHA...$HEAD_SHA" | grep -q '^specs/'; then
-            echo "✓ 偵測到 specs/ 變更。"
-            exit 0
+
+          if ! git diff --name-only "$BASE_SHA...$HEAD_SHA" | grep -q '^specs/'; then
+            echo "::error::此 PR 未更新 specs/。開發完請把行為變更整理回 specs/；若確實無行為變更，請為 PR 掛上 no-spec label。"
+            exit 1
           fi
-          echo "::error::此 PR 未更新 specs/。開發完請把行為變更整理回 specs/；若確實無行為變更，請為 PR 掛上 no-spec label。"
-          exit 1
+          echo "✓ 偵測到 specs/ 變更。"
+
+          # 對「新增/修改」的主題檔（排除 README 與刪除）做四段格式檢查
+          FILES=$(git diff --name-only --diff-filter=d "$BASE_SHA...$HEAD_SHA" \
+            | grep -E '^specs/.+\.md$' | grep -v '^specs/README\.md$' || true)
+          fail=0
+          for f in $FILES; do
+            errs=""
+            head -n1 "$f" | grep -q '^# '   || errs="$errs 缺『# 標題』"
+            grep -q '^> '       "$f"        || errs="$errs 缺『> 一句話』"
+            grep -q '^## 行為'  "$f"        || errs="$errs 缺『## 行為』"
+            if [ -n "$errs" ]; then
+              echo "::error file=$f::$f 格式不符:$errs（四段格式見 specs/README.md）"
+              fail=1
+            fi
+            grep -q '^## 相關' "$f" || echo "::warning file=$f::$f 建議補『## 相關』連回 code / issue"
+          done
+          if [ "$fail" -ne 0 ]; then exit 1; fi
+          echo "✓ specs 格式檢查通過。"
