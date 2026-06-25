@@ -5,17 +5,17 @@
 > **`specs/`** = 專案記憶（系統做什麼）· **GitHub Issue** = 輕量 TODO（這次做什麼）· **branch / PR / CI** = 程式碼與守門。
 > 三層零重疊，狀態流轉一律經固定動作 —— 讓多人 / 多個 AI agent 能無痛接力同一專案。
 
+![specflow 協作流程狀態機：需求 → needs-design → ready → in-progress → in-review → closed，以及 in-progress 移除 assignee 後成為「待接手」、他人 today 看到並 claim 接手的迴圈](assets/flow.png)
+
 ## 為什麼用它
 
 - **新 agent 接手不靠口頭交接**：靠 GitHub issue 的 `label + assignee` 當唯一真相，靠 `specs/` 當「系統現在做什麼」的記憶。`claim` 後讀 specs 就能上手，不必重掃 codebase。
 - **記憶不腐壞**：CI `specs` job 擋下「改了行為卻沒更新 specs/」的 PR。
 - **流程即程式**：六個動作是 slash command，也能用白話自然觸發（「叫後端補接口」→ 開卡；「我來接 #5」→ 認領）。
 
-## 流程一覽（狀態機）
+## 接任務的兩個入口
 
-![specflow 協作流程狀態機：需求 → needs-design → ready → in-progress → in-review → closed，以及 in-progress 移除 assignee 後成為「待接手」、他人 today 看到並 claim 接手的迴圈](assets/flow.png)
-
-**「接任務」的兩個入口**（都走 `today` → `claim`）：
+對照最上方流程圖，「接任務」都走 `today` → `claim`：
 
 | 場景 | 怎麼接 |
 |---|---|
