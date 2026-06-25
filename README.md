@@ -55,6 +55,7 @@
 | `claim` | 認領：指派 + 轉 `in-progress` + 開 `feat/<n>-<slug>` + 載入 specs | `/specflow:claim <n>` |
 | `report` | 回報進度（commit/push/留言）；帶交接語意則移除 assignee | `/specflow:report <n>` |
 | `finish` | 整理 specs → typecheck/build → 開 PR（`Closes #<n>`）→ 轉 `in-review` | `/specflow:finish <n>` |
+| `review` | 審 PR：對照驗收條件 + 查 specs 同步 + 找 bug，給 approve / 要修改 | `/specflow:review [<n>]` |
 | `init` | **一次性**把新專案接上：建 labels、scaffold `specs/` / `CLAUDE.md` / CI 守門 | `/specflow:init` |
 | `doctor` | 健檢專案有沒有接好（labels / CLAUDE.md 佔位 / specs / CI / gh 登入），列出待補項 | `/specflow:doctor` |
 
@@ -161,7 +162,7 @@ specflow/                                   ← 此 repo（同時是 marketplace
 ├── .claude-plugin/marketplace.json
 ├── plugins/specflow/                       ← 插件本體
 │   ├── .claude-plugin/plugin.json
-│   ├── skills/{new-feature,ready,next,claim,report,finish,init,doctor}/SKILL.md
+│   ├── skills/{new-feature,ready,next,claim,report,finish,review,init,doctor}/SKILL.md
 │   ├── hooks/{hooks.json,session-start.sh}
 │   ├── scripts/doctor.sh
 │   ├── rules/issue-template.md

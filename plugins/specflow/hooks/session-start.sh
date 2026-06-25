@@ -32,6 +32,12 @@ if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
   gh issue list --state open \
     --search "no:assignee label:in-progress${DOMAIN:+ label:$DOMAIN}" \
     --json number,title --jq '.[] | "#\(.number) \(.title)"' || true
+  echo ""
+
+  echo "## 待審 PR（in-review，等人 review）"
+  gh pr list --state open \
+    --json number,title,author,isDraft \
+    --jq '.[] | select(.isDraft | not) | "#\(.number) \(.title) — @\(.author.login)"' || true
 else
   echo "## GitHub issue 概況"
   echo "  (gh 未登入；執行 'gh auth login' 後可在開工時看到 ready / 待接手清單)"

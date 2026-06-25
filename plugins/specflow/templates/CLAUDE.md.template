@@ -14,8 +14,9 @@
 - 進度用 `report`（commit + push + 在 issue 留言；交接時移除 assignee）。
 - **完工前必須整理 `specs/`**：把這次的行為變更整理回對應主題的 `specs/<主題>.md`（新增功能就新增一個檔）。用 `finish` 開 PR。
 - `finish`：對有改動的子專案跑 typecheck/build → 開 PR（內文必含 `Closes #<n>`）。
+- PR 開出後用 `review`（非作者來審）：對照驗收條件、確認 `specs/` 同步、找 bug，給 approve 或要求修改；**merge 由人決定，不自動合併**。
 
-> **觸發方式（給 agent）**：上面動作（new-feature / ready / next / claim / report / finish）同時是 **slash command**（`/specflow:<name>`）與 **skill**（講白話自動觸發，如「叫後端補接口」→ new-feature、「我來接 #5」→ claim）。Agent 收到對應語意的需求時**主動走對應流程**，不要繞過流程直接動手；語意模糊或牽涉開卡 / 認領 / 交接時，先跟使用者確認再執行。狀態流轉一律經這些動作，別手動改 label / assignee。
+> **觸發方式（給 agent）**：上面動作（new-feature / ready / next / claim / report / finish / review）同時是 **slash command**（`/specflow:<name>`）與 **skill**（講白話自動觸發，如「叫後端補接口」→ new-feature、「我來接 #5」→ claim）。Agent 收到對應語意的需求時**主動走對應流程**，不要繞過流程直接動手；語意模糊或牽涉開卡 / 認領 / 交接時，先跟使用者確認再執行。狀態流轉一律經這些動作，別手動改 label / assignee。
 
 ## 三層職責（零重疊）
 
